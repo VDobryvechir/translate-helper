@@ -3,18 +3,22 @@ package org.sponsorschoose.translate.model;
 import java.util.*;
 
 public class TranslationBlock {
-    
+
     private String id;
     private List<String> words;
     private String text;
+    private String separator;
+    private String mode;
 
     public TranslationBlock() {
     }
 
-    public TranslationBlock(String id,List<String> words, String text) {
-       this.id = id;
-       this.words = words;
-       this.text = text; 
+    public TranslationBlock(String id, List<String> words, String text, String separator, String mode) {
+        this.id = id;
+        this.words = words;
+        this.text = text;
+        this.separator = separator;
+        this.mode = mode;
     }
 
     public String getId() {
@@ -41,4 +45,11 @@ public class TranslationBlock {
         this.text = text;
     }
 
+    public String getSeparator() {
+        return separator;
+    }
+
+    public String getMode() {
+        return mode;
+    }
 }
