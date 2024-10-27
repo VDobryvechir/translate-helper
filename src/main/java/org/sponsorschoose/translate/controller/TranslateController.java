@@ -1,5 +1,6 @@
 package org.sponsorschoose.translate.controller;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +24,7 @@ public class TranslateController {
 		return translateService.makeWordStatistics(src, dst, kind);
 	}
 
+	@CrossOrigin
 	@GetMapping("/next/{src}/{dst}/{kind}")
 	public WordInfo next(@PathVariable String src, @PathVariable String dst, @PathVariable String kind,
 			@RequestParam(defaultValue = "0") int limit, @RequestParam(defaultValue = "") String separator,
@@ -30,6 +32,7 @@ public class TranslateController {
 		return translateService.getNextPortion(src, dst, kind, new ParseMode(limit, separator, mode, src, dst));
 	}
 
+	@CrossOrigin
 	@PostMapping("/part/{src}/{dst}/{kind}")
 	public WordInfo part(@PathVariable String src, @PathVariable String dst, @PathVariable String kind,
 			@RequestBody String buf,

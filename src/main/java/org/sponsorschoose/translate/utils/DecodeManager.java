@@ -49,6 +49,9 @@ public class DecodeManager {
                         }
                         count++;
                         int shift = 0;
+                        if (pos == startPos) {
+                                throw new RuntimeException("Omitted translation at " + pos);
+                        }
                         if (pos > 0) {
                                 while (pos - shift - 1 >= 0 && buf.charAt(pos - shift - 1) <= 32)
                                         shift++;

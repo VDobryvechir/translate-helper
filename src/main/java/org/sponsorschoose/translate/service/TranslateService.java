@@ -3,16 +3,22 @@ package org.sponsorschoose.translate.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.slf4j.LoggerFactory;
 import org.sponsorschoose.translate.model.*;
 import org.sponsorschoose.translate.utils.DecodeManager;
+import org.sponsorschoose.translate.utils.TextParsingUtils;
 
 import java.util.*;
 import java.io.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 @Service
 public class TranslateService {
+
+    private static Logger logger = LoggerFactory.getLogger(TranslateService.class);
 
     @Autowired
     TranslationRepository translationRepository;
@@ -30,19 +36,22 @@ public class TranslateService {
                 return wordInfo;
             }
             StringBuilder sb = new StringBuilder();
-            int n = DecodeManager.encodeWordBatch(id, words, sb, parseMode);
+            List<String> wordCopy = TextParsingUtils.prepareLinesForTranslation(words);
+            int n = DecodeManager.encodeWordBatch(id, wordCopy, sb, parseMode);
             String res = sb.toString();
             List<String> origWords = words;
             if (n != words.size()) {
                 origWords = words.subList(0, n);
+                wordCopy = wordCopy.subList(0, n);
             }
-            ensureWordBatch(id, origWords, res, parseMode.getSeparator(), parseMode.getMode(), src);
+            ensureWordBatch(id, wordCopy, res, parseMode.getSeparator(), parseMode.getMode(), src);
             TranslationBlock tb = new TranslationBlock(id, origWords, res, parseMode.getSeparator(),
                     parseMode.getMode());
             translationRepository.save(tb);
             wordInfo.setWords(res);
             return wordInfo;
         } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
             return reportError(ex.toString());
         }
     }
@@ -75,6 +84,7 @@ public class TranslateService {
             insertTranslations(data, dst, origWords, words);
             saveTranslationFile(src, kind, data);
         } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
             return reportError(ex.toString());
         }
         return getNextPortion(src, dst, kind, parseMode);
@@ -125,59 +135,17 @@ public class TranslateService {
     public String makeWordStatistics(String src, String dst, String kind) {
         try {
             Map<String, TranslateEntry> data = readTranslationFile(src, kind);
-            String res = getWordStatistics(data, dst);
+            String res = TextParsingUtils.getWordStatistics(data, dst);
             return "Src=" + src + " kind=" + kind + ": " + res;
         } catch (Exception ex) {
             return ex.toString();
         }
     }
 
-    private String getWordStatistics(Map<String, TranslateEntry> data, String dst) {
-        int total = 0;
-        int totalEntries = 0;
-        int left = 0;
-        int totalChars = 0;
-        for (Map.Entry<String, TranslateEntry> entry : data.entrySet()) {
-            TranslateEntry translate = entry.getValue();
-            totalEntries++;
-            if (translate.getTr() != null && translate.getOr() != null && translate.getOr().length() > 0) {
-                Map<String, String> tr = translate.getTr();
-                String word = tr.get(dst);
-                total++;
-                if (word == null || word.length() == 0) {
-                    String add = translate.getOr();
-                    left++;
-                    totalChars += add.length() + 6;
-                }
-            }
-        }
-        int batches = totalChars / (5000 - 37);
-        return dst + " words left: " + left + " / " + total + " / " + totalEntries + " Characters = " + totalChars
-                + " Batches = " + batches;
-    }
-
-    ArrayList<String> getNextPortion(String src, String dst, String kind, int totalLimit, int unitWeight,
+    private ArrayList<String> getNextPortion(String src, String dst, String kind, int totalLimit, int unitWeight,
             WordInfo wordInfo) throws Exception {
         Map<String, TranslateEntry> data = readTranslationFile(src, kind);
-        wordInfo.setStatistics(getWordStatistics(data, dst));
-        ArrayList<String> words = new ArrayList<>(1024);
-        int weight = 0;
-        for (Map.Entry<String, TranslateEntry> entry : data.entrySet()) {
-            TranslateEntry translate = entry.getValue();
-            if (translate.getTr() != null && translate.getOr() != null && translate.getOr().length() > 0) {
-                Map<String, String> tr = translate.getTr();
-                String word = tr.get(dst);
-                if (word == null || word.length() == 0) {
-                    String add = translate.getOr();
-                    weight += add.length() + unitWeight;
-                    if (weight > totalLimit) {
-                        break;
-                    }
-                    words.add(add);
-                }
-            }
-        }
-        return words;
+        return TextParsingUtils.extractArrayLine(src, dst, kind, totalLimit, unitWeight, wordInfo, data);
     }
 
     private void ensureWordBatch(String id, List<String> words, String buf, String separator, String mode,

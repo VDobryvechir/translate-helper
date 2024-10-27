@@ -1,0 +1,5 @@
+Open Run dialogue box by pressing Win + R, then type mmc and hit Enter.
+Go to File > Add/Remove Snap-in, select Certificates and click Add.
+Choose Computer account and click Next, then Finish.
+Navigate to Certificates (Local Computer) > Trusted Root Certification Authorities > Certificates.
+Right-click on Certificates, choose All Tasks > Import to start the Certificate Import Wizard. Follow the prompts to import your self-signed certificate.

@@ -7,22 +7,22 @@ import java.util.Map;
 public class ControlWord {
 
     private static Map<String, String> map0 = Stream.of(new String[][] {
-            { "nb", "Ku" },
-            { "en", "Cow" },
-            { "nn", "Ku" },
-            { "uk", "Корова" },
-            { "de", "Kuh" },
-            { "pl", "Krowa" },
-            { "it", "Mucca" },
-            { "es", "Vaca" },
-            { "da", "Ko" },
-            { "ru", "Корова" },
-            { "sv", "Ko" },
-            { "gr", "Αγελάδα" },
-            { "pt", "Vaca" },
-            { "cz", "Kráva" },
-            { "bg", "Крава" },
-            { "fr", "Vache" },
+            { "nb", "Blomster" },
+            { "en", "Flowers" },
+            { "nn", "Blomstrar" },
+            { "uk", "Квіти" },
+            { "de", "Blumen" },
+            { "pl", "Kwiaty" },
+            { "it", "Fiori" },
+            { "es", "Flores" },
+            { "da", "Blomster" },
+            { "ru", "Цветы" },
+            { "sv", "Blommor" },
+            { "gr", "Λουλούδια" },
+            { "pt", "Flores" },
+            { "cz", "Květiny" },
+            { "bg", "Цветя" },
+            { "fr", "Fleurs" },
 
     }).collect(Collectors.toMap(data -> data[0], data -> data[1]));
 

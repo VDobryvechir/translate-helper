@@ -1,0 +1,1 @@
+"C:\Program Files\Java\jdk-23\bin\keytool.exe" -keystore localhost.p12 -exportcert -file localhost.crt -rfc -alias localhost
