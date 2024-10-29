@@ -14,21 +14,17 @@ public class DecodeManager {
         final public static String PreDecodeWord = ". ";
         final public static String PostDecodeWord = " ";
 
-        // final public static int DecodeWordLength = DecodeWord.length();
-        // final public static int DigitPosInDecodeWord = DecodeWord.indexOf("0");
-        // final public static String WholePreDecode = PreDecodeWord +
-        // DecodeWord.substring(0, DigitPosInDecodeWord);
-        //
         final public static int UUIDAndSpaceLength = 36 + 1;
 
         public static List<String> decodeWordBatch(String buf, String separator, String mode, String dstLang) {
-                buf = buf.trim().substring(UUIDAndSpaceLength);
+                buf = buf.trim();
+                String id = buf.substring(0, 36);
+                buf = buf.substring(UUIDAndSpaceLength);
                 String decodeWord = separator + PostDecodeWord;
-                char[] search = decodeWord.toCharArray();
-                int digitPosInDecodeWord = decodeWord.indexOf('0');
-                boolean isControlWord = digitPosInDecodeWord < 0;
-                if (isControlWord) {
-                        digitPosInDecodeWord = decodeWord.indexOf('1');
+                int digitPosInDecodeWord = TextParsingUtils.findFirstDigit(decodeWord);
+                int method = TextParsingUtils.detectDigitAtPos(decodeWord, digitPosInDecodeWord);
+                if (digitPosInDecodeWord < 0) {
+                        digitPosInDecodeWord = 0;
                 }
                 String partFirst = decodeWord.substring(0, digitPosInDecodeWord);
                 String partLast = decodeWord.substring(digitPosInDecodeWord + 1);
@@ -40,9 +36,10 @@ public class DecodeManager {
                         while (pos < n && buf.charAt(pos) <= 32)
                                 pos++;
                         int startPos = pos;
-                        search[digitPosInDecodeWord] = (char) (count % 10 + 48);
-                        String t = isControlWord ? partFirst + ControlWord.getControlWord(count, dstLang) + partLast
-                                        : new String(search);
+                        String t = partFirst + (method == 1 ? ControlWord.getControlWord(count, dstLang)
+                                        : (method == 2 ? ControlWord.generateWordByLetters(id, count)
+                                                        : (method == 0 ? Integer.toString(count) : "")))
+                                        + partLast;
                         pos = buf.indexOf(t, pos);
                         if (pos < 0) {
                                 pos = n;
@@ -72,9 +69,7 @@ public class DecodeManager {
                 if (parseMode.getMode() == null || parseMode.getMode().length() != 2) {
                         parseMode.setMode(defaultMode);
                 }
-                if (parseMode.getSeparator() == null || parseMode.getSeparator().length() == 0 ||
-                                (parseMode.getSeparator().indexOf('0') < 0
-                                                && parseMode.getSeparator().indexOf('1') < 0)) {
+                if (parseMode.getSeparator() == null || parseMode.getSeparator().length() == 0) {
                         parseMode.setSeparator(defaultSerarator);
                 } else {
                         parseMode.setSeparator(parseMode.getSeparator().trim());
@@ -84,31 +79,47 @@ public class DecodeManager {
         public static int encodeWordBatch(String id, List<String> words, StringBuilder buf, ParseMode parseMode) {
                 validateParseMode(parseMode);
                 int limit = parseMode.getLimit();
-                int digitPosInDecodeWord = parseMode.getSeparator().indexOf('0');
-                boolean isControlWord = digitPosInDecodeWord < 0;
-                if (isControlWord) {
-                        digitPosInDecodeWord = parseMode.getSeparator().indexOf('1');
+                String decodeWord = parseMode.getSeparator();
+                int digitPosInDecodeWord = TextParsingUtils.findFirstDigit(decodeWord);
+                int method = TextParsingUtils.detectDigitAtPos(decodeWord, digitPosInDecodeWord);
+                if (digitPosInDecodeWord < 0) {
+                        digitPosInDecodeWord = 0;
                 }
                 String wholePreDecode = PreDecodeWord + parseMode.getSeparator().substring(0, digitPosInDecodeWord);
                 String wholePostDecode = parseMode.getSeparator().substring(digitPosInDecodeWord + 1) + PostDecodeWord;
                 String lang = parseMode.getSrcLang();
-                int extraSize = wholePreDecode.length() + wholePostDecode.length()
-                                + (isControlWord ? ControlWord.getMaxLength(lang) : 1);
+                int extraSize = wholePreDecode.length() + wholePostDecode.length();
+                switch (method) {
+                        case 0:
+                                extraSize += 4;
+                                break;
+                        case 1:
+                                extraSize += ControlWord.getMaxLength(lang);
+                                break;
+                        case 2:
+                                extraSize += 10;
+                }
                 buf.append(id);
                 buf.append(' ');
                 int n = words.size();
                 for (int i = 0; i < n; i++) {
                         String word = words.get(i);
-                        int nextLimit = word.length() + extraSize + buf.length();
-                        if (nextLimit >= limit) {
-                                return i;
-                        }
                         if (i != 0) {
+                                int nextLimit = word.length() + extraSize + buf.length();
+                                if (nextLimit >= limit) {
+                                        return i;
+                                }
                                 buf.append(wholePreDecode);
-                                if (isControlWord) {
-                                        buf.append(ControlWord.getControlWord(i, lang));
-                                } else {
-                                        buf.append((char) ((i % 10) + 48));
+                                switch (method) {
+                                        case 0:
+                                                buf.append(i);
+                                                break;
+                                        case 1:
+                                                buf.append(ControlWord.getControlWord(i, lang));
+                                                break;
+                                        case 2:
+                                                ControlWord.addGeneratedWordByLetters(buf, id, i);
+                                                break;
                                 }
                                 buf.append(wholePostDecode);
                         }

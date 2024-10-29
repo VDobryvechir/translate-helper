@@ -81,4 +81,26 @@ public class TextParsingUtils {
         return words;
     }
 
+    public static int findFirstDigit(String s) {
+        int n = s.length();
+        for (int i = 0; i < n; i++) {
+            char c = s.charAt(i);
+            if (c >= '0' && c <= '9') {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static int detectDigitAtPos(String s, int pos) {
+        if (pos < 0 || pos > s.length()) {
+            return -1;
+        }
+        char c = s.charAt(pos);
+        if (c >= '0' && c <= '9') {
+            return c - 48;
+        }
+        return -1;
+    }
+
 }

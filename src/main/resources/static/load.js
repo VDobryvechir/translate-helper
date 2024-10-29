@@ -6,22 +6,22 @@
     const defaultServer = "https://localhost:8443";
 
     const dictionaryOfControlWords = {
-          en: ['Flowers','Bird','Evening'],
-          uk: ['Квіти','Птах','Вечір'],  
-          nb: ['Blomster','Fugl','Kveld'],  
-          nn: ['Blomstrar','Fugl','Kveld'],  
-          de: ['Blumen','Vogel','Abend'],  
-          pl: ['Kwiaty','Ptak','Wieczór'],  
-          it: ['Fiori','Uccello','Sera'],  
-          es: ['Flores','Pájaro','Tarde'],  
-          fr: ['Fleurs','Oiseau','Soir'],  
-          pt: ['Flores','Pássaro','Noite'],  
-          ru: ['Цветы','Птица','Вечер'],  
-          sv: ['Blommor','Fågel','Afton'],  
-          da: ['Blomster','Fugl','Aften'],  
-          gr: ['Λουλούδια','Πουλί','Εσπερινός'],  
-          cz: ['Květiny','Pták','Večer'],  
-          bg: ['Цветя','Птица','Вечер'],  
+        bg: ['Цветя','Енциклопедия','Вечер'],  
+        cz: ['Květiny','Encyklopedie','Večer'],  
+        da: ['Blomster','Encyklopædi','Aften'],  
+        de: ['Blumen','Enzyklopädie','Abend'],  
+        en: ['Flowers','Encyclopedia','Evening'],
+        es: ['Flores','Enciclopedia','Tarde'],  
+        fr: ['Fleurs','Encyclopédie','Soir'],  
+        gr: ['Λουλούδια','Εγκυκλοπαιδεία','Εσπερινός'],  
+        it: ['Fiori','Enciclopedia','Sera'],  
+        nb: ['Blomster','Encyclopedia','Kveld'],  
+        nn: ['Blomstrar','Encyclopedia','Kveld'],  
+        pl: ['Kwiaty','Encyklopedia','Wieczór'],  
+        pt: ['Flores','Enciclopédia','Noite'],  
+        ru: ['Цветы','Энциклопедия','Вечер'],  
+        sv: ['Blommor','Encyklopedi','Afton'],  
+        uk: ['Квіти','Енциклопедія','Вечір'],  
      };   
      function calculateWordEntry(word, data) {
         const n = data.length;
