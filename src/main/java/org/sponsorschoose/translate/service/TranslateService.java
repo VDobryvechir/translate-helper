@@ -112,7 +112,7 @@ public class TranslateService {
         return appTranslatePath.replace("[kind]", kind).replace("[src]", src);
     }
 
-    private Map<String, TranslateEntry> readTranslationFile(String src, String kind) throws Exception {
+    public Map<String, TranslateEntry> readTranslationFile(String src, String kind) throws Exception {
 
         String fileName = getTranslationFileName(src, kind);
         ObjectMapper mapper = new ObjectMapper();
@@ -122,7 +122,7 @@ public class TranslateService {
         return mapEntries;
     }
 
-    private void saveTranslationFile(String src, String kind, Map<String, TranslateEntry> data) throws Exception {
+    public void saveTranslationFile(String src, String kind, Map<String, TranslateEntry> data) throws Exception {
 
         String fileName = getTranslationFileName(src, kind);
         ObjectMapper mapper = new ObjectMapper();

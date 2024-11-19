@@ -20,24 +20,29 @@ public class TranslateController {
 	private TranslateService translateService;
 
 	@GetMapping("/count/{src}/{dst}/{kind}")
-	public String count(@PathVariable String src, @PathVariable String dst, @PathVariable String kind) {
+	public String count(@PathVariable("src") String src, @PathVariable("dst") String dst,
+			@PathVariable("kind") String kind) {
 		return translateService.makeWordStatistics(src, dst, kind);
 	}
 
 	@CrossOrigin
 	@GetMapping("/next/{src}/{dst}/{kind}")
-	public WordInfo next(@PathVariable String src, @PathVariable String dst, @PathVariable String kind,
-			@RequestParam(defaultValue = "0") int limit, @RequestParam(defaultValue = "") String separator,
-			@RequestParam(defaultValue = "") String mode) {
+	public WordInfo next(@PathVariable("src") String src, @PathVariable("dst") String dst,
+			@PathVariable("kind") String kind,
+			@RequestParam(name = "limit", defaultValue = "0") int limit,
+			@RequestParam(name = "separator", defaultValue = "") String separator,
+			@RequestParam(name = "mode", defaultValue = "") String mode) {
 		return translateService.getNextPortion(src, dst, kind, new ParseMode(limit, separator, mode, src, dst));
 	}
 
 	@CrossOrigin
 	@PostMapping("/part/{src}/{dst}/{kind}")
-	public WordInfo part(@PathVariable String src, @PathVariable String dst, @PathVariable String kind,
+	public WordInfo part(@PathVariable("src") String src, @PathVariable("dst") String dst,
+			@PathVariable("kind") String kind,
 			@RequestBody String buf,
-			@RequestParam(defaultValue = "0") int limit, @RequestParam(defaultValue = "") String separator,
-			@RequestParam(defaultValue = "") String mode) {
+			@RequestParam(name = "limit", defaultValue = "0") int limit,
+			@RequestParam(name = "separator", defaultValue = "") String separator,
+			@RequestParam(name = "mode", defaultValue = "") String mode) {
 		return translateService.saveNextPortion(src, dst, kind, buf, new ParseMode(limit, separator, mode, src, dst));
 	}
 
